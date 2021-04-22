@@ -1,31 +1,33 @@
-<template xmlns="http://www.w3.org/1999/html">
+<template>
   <div>
-    <v-row align="center" justify="center">
-      <v-col md="4" align-self="center">
-        <v-card class="text-center">
-          <v-card-title>Valor Dolar</v-card-title>
-          <v-card-text>
-            <v-date-picker
-                v-model="fecha"
-                first-day-of-week="1"
-                locale="es_CL"
-                min="1984"
-                :max="today"
-                :disabled="disabled"
-                @change="getDolarDay()"
-            ></v-date-picker>
+    <v-row>
+      <v-col md="4">
+        <v-card>
+          <v-card class="text-center">
+            <v-card-title>Valor Uf</v-card-title>
+            <v-card-text>
+              <v-date-picker
+                  v-model="fecha"
+                  first-day-of-week="1"
+                  locale="es_CL"
+                  min="1977"
+                  :max="today"
+                  :disabled="disabled"
+                  @change="getUFDay()"
+              ></v-date-picker>
 
-          </v-card-text>
-          <v-card-text>
-            <div class="text-h5"> $ {{ valor }}</div>
-          </v-card-text>
+            </v-card-text>
+            <v-card-text>
+              <div class="text-h5"> $ {{ valor }}</div>
+            </v-card-text>
+          </v-card>
         </v-card>
       </v-col>
-      <v-col md="8" >
+      <v-col md="8">
         <v-card>
-          <v-card-title>Valor Dólar 2021</v-card-title>
+          <v-card-title>Valor UF 2021</v-card-title>
           <v-card-text>
-            <div class="chartdollaryear" ref="chartdollaryear"></div>
+            <div class="chartufyear" ref="chartufyear"></div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -44,7 +46,7 @@ am4core.useTheme(am4themes_animated);
 import axios from "axios"
 import { mapMutations} from 'vuex'
 export default {
-  name: 'Home',
+  name: 'Uf',
   data(){
     return{
       fecha: new Date().toISOString().toLocaleString("es-CL", {timeZone: "America/Santiago"}).substr(0, 10),
@@ -56,13 +58,13 @@ export default {
   },
   methods:{
     ...mapMutations(['mostraLoading', 'ocultarLoading']),
-    async getDolarDay(){
+    async getUFDay(){
       let arrayFec = this.fecha.split("-").reverse().join("-")
       try {
         this.mostraLoading({titulo: 'Trayendo información', color: 'secondary'})
         this.disabled = true
         //console.log(arrayFec)
-        await axios.get(`https://mindicador.cl/api/dolar/${arrayFec}`)
+        await axios.get(`https://mindicador.cl/api/uf/${arrayFec}`)
             .then(
                 response => {
                   this.disabled = false
@@ -78,11 +80,11 @@ export default {
         this.ocultarLoading()
       }
     },
-    async getDolarYear(){
+    async getUFYear(){
       let soloAño=this.fecha.split("-")[0]
-      let result = await axios.get(`https://mindicador.cl/api/dolar/${soloAño}`)
+      let result = await axios.get(`https://mindicador.cl/api/uf/${soloAño}`)
       let datos = await result.data.serie;
-      let chart = am4core.create(this.$refs.chartdollaryear, am4charts.XYChart);
+      let chart = am4core.create(this.$refs.chartufyear, am4charts.XYChart);
       chart.dateFormatter.inputDateFormat = "yyyy-MM-dd";
       chart.language.locale = am4lang_es_ES;
       //chart.paddingRight = 20;
@@ -97,8 +99,8 @@ export default {
 
 
       let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-/*      dateAxis.renderer.grid.template.location = 0;
-      dateAxis.renderer.minGridDistance = 50;*/
+      /*      dateAxis.renderer.grid.template.location = 0;
+            dateAxis.renderer.minGridDistance = 50;*/
 
       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
       valueAxis.tooltip.disabled = true;
@@ -119,14 +121,15 @@ export default {
     }
   },
   created() {
-    this.getDolarDay()
-    this.getDolarYear()
+    this.getUFDay()
+    this.getUFYear()
   }
 }
 </script>
 <style scoped>
-.chartdollaryear {
+.chartufyear {
   width: 100%;
   height: 437px;
 }
 </style>
+
